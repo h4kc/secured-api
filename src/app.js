@@ -4,11 +4,14 @@ import config from './config/config.js';
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
+app.post('/greeting', (req, res) => {
+  res.sendStatus(200);
 });
 
 const port = config.port;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+
+export default app
