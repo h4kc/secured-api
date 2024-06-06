@@ -4,7 +4,7 @@ import config from './config/config.js';
 
 const app = express();
 
-app.post('/greeting', (req, res) => {
+app.get('/greeting', (req, res) => {
   res.sendStatus(200);
 });
 
