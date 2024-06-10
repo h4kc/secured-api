@@ -1,7 +1,7 @@
 // src/index.js
 import express from 'express';
 import config from './config/config.js';
-
+import logger from "./config/logger.js"
 const app = express();
 
 app.get('/greeting', (req, res) => {
@@ -10,8 +10,8 @@ app.get('/greeting', (req, res) => {
 
 const port = config.port;
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  logger.info(`Server running on http://localhost:${port}`);
 });
 
-
+logger.security("security")
 export default app
