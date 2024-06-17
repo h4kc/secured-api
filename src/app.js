@@ -16,6 +16,5 @@ app.listen(port, () => {
 logger.security("security")
 logger.error("error")
 logger.http("http")
-logger.info("security")
 
 export default app

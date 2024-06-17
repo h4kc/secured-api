@@ -1,6 +1,14 @@
 import { createLogger, format, transports } from "winston";
 const { combine, timestamp, errors, json } = format;
 
+const errorFilter = format((info, opts) => {
+  return info.level === "error" ? info : false;
+});
+
+const httpFilter = format((info, opts) => {
+  return info.level === "http" ? info : false;
+});
+
 const customLevels = {
   levels: {
     security: 0,
@@ -18,17 +26,31 @@ const logger = createLogger({
     environment: process.env.SERVICE_NAME,
   },
   transports: [
-    new transports.File({ filename: "logs/http.log", level: "http" }), // Log http messages to file
-    new transports.File({ filename: "logs/security.log", level: "security" }), // Log security messages to file
-    new transports.File({ filename: "logs/error.log", level: "error" }), // Log errors to file
+    new transports.File({
+      filename: "logs/http.log",
+      level: "http",
+      format: combine(
+        httpFilter(),
+        errors({ stack: true }),
+        timestamp(),
+        json()
+      ),
+    }), 
+    new transports.File({ filename: "logs/security.log", level: "security" }), 
+    new transports.File({
+      filename: "logs/error.log",
+      level: "error",
+      format: combine(
+        errorFilter(),
+        errors({ stack: true }),
+        timestamp(),
+        json()
+      ),
+    }), 
     new transports.File({ filename: "logs/combined.log" }), // Log all messages to file
   ],
 });
 
-//
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-//
 if (process.env.NODE_ENV !== "production") {
   logger.add(
     new transports.Console({
