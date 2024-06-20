@@ -1,12 +1,20 @@
 // src/index.js
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+
 import config from './config/config.js';
 import logger from "./config/logger.js"
-const app = express();
+import swaggerSpec from './config/swagger.js';
+import greetingRoutes from './routes/greeting.js';
 
-app.get('/greeting', (req, res) => {
-  res.sendStatus(200);
-});
+const app = express();
+app.use(express.json());
+
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api', greetingRoutes);  // Add this line
+
 
 const port = config.port;
 app.listen(port, () => {
