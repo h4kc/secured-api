@@ -1,12 +1,13 @@
 import swaggerJSDoc from 'swagger-jsdoc';
+import config from './config.js';
 
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Meetings API',
+      title: config.title,
       version: '1.0.0',
-      description: 'API documentation for the Meetings API',
+      description: 'API documentation',
     },
     servers: [
       {
@@ -14,7 +15,7 @@ const options = {
       },
     ],
   },
-  apis: ['./src/routes/*.js'], // Paths to files containing OpenAPI definitions
+  apis: ['./src/routes/*.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

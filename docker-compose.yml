@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  #MongoDB
+  mongo_db:
+    container_name: database_container
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+
+  app:
+    build: .
+    ports:
+      - 4000:3000
+    environment:
+      APP_NAME: MeetingsApi  
+      SERVICE_NAME: meetings_api
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: mongodb://mongo_db:27017/meetings_api
+    volumes:
+      - meetings_api_logs:/usr/src/app/logs
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_db: {}
+  meetings_api_logs: {}

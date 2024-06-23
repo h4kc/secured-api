@@ -1,4 +1,5 @@
 import { createLogger, format, transports } from "winston";
+import config from "./config.js";
 const { combine, timestamp, errors, json } = format;
 
 const errorFilter = format((info, opts) => {
@@ -8,13 +9,16 @@ const errorFilter = format((info, opts) => {
 const httpFilter = format((info, opts) => {
   return info.level === "http" ? info : false;
 });
-
+const dbFilter = format((info, opts) => {
+  return info.level === "db" ? info : false;
+});
 const customLevels = {
   levels: {
     security: 0,
     error: 1,
     http: 2,
-    info: 3,
+    db:3,
+    info: 4,
   },
 };
 const logger = createLogger({
@@ -22,10 +26,11 @@ const logger = createLogger({
   level: "info",
   format: combine(timestamp(), json(), errors({ stack: true })),
   defaultMeta: {
-    service: process.env.NODE_ENV,
-    environment: process.env.SERVICE_NAME,
+    environment: config.env,
+    service: config.title,
   },
   transports: [
+    new transports.File({ filename: "logs/security.log", level: "security" }), 
     new transports.File({
       filename: "logs/http.log",
       level: "http",
@@ -36,7 +41,16 @@ const logger = createLogger({
         json()
       ),
     }), 
-    new transports.File({ filename: "logs/security.log", level: "security" }), 
+    new transports.File({
+      filename: "logs/db.log",
+      level: "db",
+      format: combine(
+        dbFilter(),
+        errors({ stack: true }),
+        timestamp(),
+        json()
+      ),
+    }), 
     new transports.File({
       filename: "logs/error.log",
       level: "error",
@@ -51,7 +65,7 @@ const logger = createLogger({
   ],
 });
 
-if (process.env.NODE_ENV !== "production") {
+if (config.env !== "production") {
   logger.add(
     new transports.Console({
       format: format.simple(),
